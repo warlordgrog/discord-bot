@@ -35,7 +35,8 @@ def run_discord_bot():
         if message.author == client.user:
             return
 
-        if message.author.id == MY_ID and message.startswith("https"):
+        # need to use `message.content` here as that's the actual message content
+        if message.author.id == MY_ID and message.content.startswith("https"):
             await message.delete()
             # can return here as we deleted message - no need to process anything else
             return
