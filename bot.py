@@ -1,36 +1,41 @@
 import discord
 import responses
 
+# user id of the user we want to delete links for
+MY_ID = 189458414764687360
+
 async def send_message(message, user_message, is_private):
     try:
         response = responses.get_response(user_message)
-        await message.author.send(response) if is_private else await message.channel.send(response)
+        if not response:
+            # response is empty - return
+            return
+
+        if is_private:
+            await message.author.send(response)
+        else:
+            await message.channel.send(response)
 
     except Exception as e:
         print(e)
 
-
 def run_discord_bot():
-    TOKEN = ''
+    TOKEN = ""
     intents = discord.Intents.default()
     intents.messages = True
     intents.message_content = True
     client = discord.Client(intents=intents)
 
-
-
-
-
     @client.event
     async def on_ready():
-        print(f'{client.user} is now running!')
+        print(f"{client.user} is now running!")
 
     @client.event
     async def on_message(message):
         if message.author == client.user:
             return
 
-        if message.author.id == 0000000000000 and message.startswith("https"):
+        if message.author.id == MY_ID and message.startswith("https"):
             await message.delete()
             # can return here as we deleted message - no need to process anything else
             return
@@ -38,29 +43,11 @@ def run_discord_bot():
         username = message.author.name
         user_message = message.content
         channel = message.channel.name
-        print(f'{username} said: "{user_message}" ({channel})')
-        if user_message[0] == '?':
+        print(f"{username} said: {user_message} ({channel})")
+        if user_message[0] == "?":
             user_message = user_message[1:]
             await send_message(message, user_message, is_private=True)
         else:
             await send_message(message, user_message, is_private=False)
 
-    @client.event
-    async def on_message(message):
-        if message.author == client.user:
-            return
-
-        username = str(message.author)
-        user_message = str(message.content)
-        channel = str(message.channel)
-
-        print(f'{username} said: "{user_message}" ({channel})')
-
-        if user_message[0] == '?':
-            user_message = user_message[1:]
-            await send_message(message, user_message, is_private=True)
-        else:
-            await send_message(message, user_message, is_private=False)
-
-
-    client.run('')
+    client.run(TOKEN)
